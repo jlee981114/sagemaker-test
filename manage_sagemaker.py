@@ -52,8 +52,11 @@ aws s3 sync s3://$S3_BUCKET/$S3_KEY_PREFIX $LOCAL_PATH
             OnStart=[{'Content': lifecycle_config_content_base64}]
         )
         print(f'Lifecycle configuration {lifecycle_config_name} created.')
-    except sagemaker_client.exceptions.ResourceLimitExceeded:
-        print(f'Lifecycle configuration {lifecycle_config_name} already exists.')
+    except sagemaker_client.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == 'ValidationException' and 'already exists' in e.response['Error']['Message']:
+            print(f'Lifecycle configuration {lifecycle_config_name} already exists.')
+        else:
+            raise
 
 def start_sagemaker_notebook_instance():
     notebook_instance_name = os.environ.get('NOTEBOOK_INSTANCE_NAME')
