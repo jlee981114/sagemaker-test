@@ -33,5 +33,5 @@ jobs:
           INSTANCE_TYPE: ml.g4dn.xlarge
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
           LIFECYCLE_CONFIG_NAME: justin-test-lcc
-          IMAGE_URI: 763104351884.dkr.ecr.us-east-1.amazonaws.com/tensorflow-training:2.6.0-gpu-py38-cu112-ubuntu20.04  # Change this to your image URI
+          IMAGE_ARN: arn:aws:sagemaker:us-east-1:081325390199:image/tensorflow-2.6-gpu-py38-cu112-ubuntu20.04  # Change this to your image ARN
         run: python manage_sagemaker.py
