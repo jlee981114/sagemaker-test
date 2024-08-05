@@ -33,5 +33,5 @@ jobs:
           INSTANCE_TYPE: ml.g4dn.xlarge
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
           LIFECYCLE_CONFIG_NAME: justin-test-lcc
-          IMAGE_ARN: arn:aws:sagemaker:us-east-1:885854791233:image/tensorflow-2.6-gpu-py38-cu112-ubuntu20.04  # Change this to your image ARN
+          IMAGE_ARN: arn:aws:sagemaker:us-east-1:885854791233:image/tensorflow-2.6-gpu-py38-cu112-ubuntu20.04
         run: python manage_sagemaker.py
