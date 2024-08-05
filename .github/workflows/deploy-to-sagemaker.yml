@@ -28,5 +28,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output  # Change this to your S3 bucket name
-          S3_KEY: notebooks/notebook.ipynb  # Change this to your S3 key
+          S3_KEY_PREFIX: notebooks  # Change this to your S3 key
         run: python upload_to_s3.py
