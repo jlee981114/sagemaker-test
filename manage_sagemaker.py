@@ -63,10 +63,10 @@ def start_sagemaker_notebook_instance():
     instance_type = os.environ.get('INSTANCE_TYPE')
     role_arn = os.environ.get('ROLE_ARN')
     lifecycle_config_name = os.environ.get('LIFECYCLE_CONFIG_NAME')
-    image_name = os.environ.get('IMAGE_NAME')
+    image_arn = os.environ.get('IMAGE_ARN')
 
-    if not notebook_instance_name or not instance_type or not role_arn or not lifecycle_config_name or not image_name:
-        raise ValueError("NOTEBOOK_INSTANCE_NAME, INSTANCE_TYPE, ROLE_ARN, LIFECYCLE_CONFIG_NAME, and IMAGE_NAME environment variables must be set")
+    if not notebook_instance_name or not instance_type or not role_arn or not lifecycle_config_name or not image_arn:
+        raise ValueError("NOTEBOOK_INSTANCE_NAME, INSTANCE_TYPE, ROLE_ARN, LIFECYCLE_CONFIG_NAME, and IMAGE_ARN environment variables must be set")
 
     sagemaker_client = boto3.client('sagemaker', region_name=os.environ.get('AWS_REGION'))
 
@@ -89,7 +89,7 @@ def start_sagemaker_notebook_instance():
             DirectInternetAccess='Enabled',
             VolumeSizeInGB=5,
             RootAccess='Enabled',
-            CustomImageArn=image_name
+            ImageArn=image_arn
         )
     else:
         print(f'Notebook instance {notebook_instance_name} already exists. Starting it.')
