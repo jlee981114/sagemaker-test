@@ -1,5 +1,6 @@
 import boto3
 import os
+import glob
 
 def upload_notebooks():
     s3_bucket = os.environ.get('S3_BUCKET')
