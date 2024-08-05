@@ -2,6 +2,7 @@ import boto3
 import os
 import glob
 import base64
+import time
 
 def upload_notebooks():
     s3_bucket = os.environ.get('S3_BUCKET')
@@ -96,8 +97,15 @@ def start_sagemaker_notebook_instance():
             RootAccess='Enabled'
         )
     else:
-        print(f'Notebook instance {notebook_instance_name} already exists. Starting it.')
+        print(f'Notebook instance {notebook_instance_name} already exists.')
+        current_status = response['NotebookInstanceStatus']
+        if current_status != 'Stopped':
+            print(f'Current status is {current_status}. Waiting for it to stop...')
+            waiter = sagemaker_client.get_waiter('notebook_instance_stopped')
+            waiter.wait(NotebookInstanceName=notebook_instance_name)
+            print(f'Notebook instance {notebook_instance_name} has stopped.')
 
+    print(f'Starting notebook instance {notebook_instance_name}.')
     sagemaker_client.start_notebook_instance(NotebookInstanceName=notebook_instance_name)
 
     waiter = sagemaker_client.get_waiter('notebook_instance_in_service')
