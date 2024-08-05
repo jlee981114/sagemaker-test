@@ -1,6 +1,7 @@
 import boto3
 import os
 import glob
+import base64
 
 def upload_notebooks():
     s3_bucket = os.environ.get('S3_BUCKET')
@@ -40,12 +41,15 @@ LOCAL_PATH="/home/ec2-user/SageMaker/"
 aws s3 sync s3://$S3_BUCKET/$S3_KEY_PREFIX $LOCAL_PATH
 '''
 
+    # Encode the lifecycle configuration content as base64
+    lifecycle_config_content_base64 = base64.b64encode(lifecycle_config_content.encode('utf-8')).decode('utf-8')
+
     sagemaker_client = boto3.client('sagemaker', region_name=os.environ.get('AWS_REGION'))
 
     try:
         sagemaker_client.create_notebook_instance_lifecycle_config(
             NotebookInstanceLifecycleConfigName=lifecycle_config_name,
-            OnStart=[{'Content': lifecycle_config_content}]
+            OnStart=[{'Content': lifecycle_config_content_base64}]
         )
         print(f'Lifecycle configuration {lifecycle_config_name} created.')
     except sagemaker_client.exceptions.ResourceLimitExceeded:
@@ -78,8 +82,7 @@ def start_sagemaker_notebook_instance():
         LifecycleConfigName=lifecycle_config_name,
         DirectInternetAccess='Enabled',
         VolumeSizeInGB=5,
-        RootAccess='Enabled',
-        ImageArn=image_name  # Add the image ARN
+        RootAccess='Enabled'
     )
 
     print(f'Starting notebook instance {notebook_instance_name}.')

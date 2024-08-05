@@ -29,9 +29,9 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
-          NOTEBOOK_INSTANCE_NAME: justin-test-notebook-instance  # Change this to your notebook instance name
-          INSTANCE_TYPE: ml.g4dn.xlarge  # Change this to your instance type
-          ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps  # Change this to your SageMaker execution role ARN
-          LIFECYCLE_CONFIG_NAME: justin-test-lcc  # Change this to your lifecycle config name
-          IMAGE_NAME: arn:aws:sagemaker:us-east-1:081325390199:image/tensorflow-2.6-gpu-py38-cu112-ubuntu20.04-v1  # Change this to your image ARN
+          NOTEBOOK_INSTANCE_NAME: justin-test-notebook-instance
+          INSTANCE_TYPE: ml.g4dn.xlarge
+          ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
+          LIFECYCLE_CONFIG_NAME: justin-test-lcc
+          IMAGE_NAME: arn:aws:sagemaker:us-east-1:081325390199:image/tensorflow-2.6-gpu-py38-cu112-ubuntu20.04-v1
         run: python manage_sagemaker.py
