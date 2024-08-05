@@ -28,6 +28,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
+          python -c "
           import boto3
           import os
 
@@ -37,4 +38,5 @@ jobs:
           s3_client = boto3.client('s3')
           s3_client.upload_file('notebook.ipynb', s3_bucket, s3_key)
 
-          print(f"Notebook uploaded to s3://{s3_bucket}/{s3_key}")
+          print(f"Notebook uploaded to s3://{s3_bucket}/{s3_key}") 
+          "
