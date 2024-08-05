@@ -1,0 +1,41 @@
+name: Deploy to SageMaker
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to use
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install AWS CLI and Boto3
+        run: |
+          pip install awscli boto3
+
+      - name: Upload Notebook to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          import boto3
+          import os
+
+          s3_bucket = 'justin-automation-outputs'  # Change this to your S3 bucket name
+          s3_key = 'notebooks/notebook.ipynb'  # Change this to your S3 key
+
+          # Upload the notebook to S3
+          s3_client = boto3.client('s3')
+          s3_client.upload_file('notebook.ipynb', s3_bucket, s3_key)
+
+          print(f"Notebook uploaded to s3://{s3_bucket}/{s3_key}")
