@@ -42,6 +42,7 @@ LOCAL_PATH="/home/ec2-user/SageMaker/"
 aws s3 sync s3://$S3_BUCKET/$S3_KEY_PREFIX $LOCAL_PATH
 
 # Set the default kernel
+mkdir -p /home/ec2-user/.local/share/jupyter/kernels/conda_tensorflow2_p310
 echo '{
  "display_name": "conda_tensorflow2_p310",
  "language": "python",
