@@ -69,23 +69,24 @@ def start_sagemaker_notebook_instance():
 
     try:
         response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
-        if response['NotebookInstanceStatus'] == 'InService':
-            print(f'Notebook instance {notebook_instance_name} is already running.')
-            return
+        instance_exists = True
     except sagemaker_client.exceptions.ResourceNotFound:
-        print(f'Notebook instance {notebook_instance_name} does not exist. Creating a new one.')
+        instance_exists = False
 
-    sagemaker_client.create_notebook_instance(
-        NotebookInstanceName=notebook_instance_name,
-        InstanceType=instance_type,
-        RoleArn=role_arn,
-        LifecycleConfigName=lifecycle_config_name,
-        DirectInternetAccess='Enabled',
-        VolumeSizeInGB=5,
-        RootAccess='Enabled'
-    )
-
-    print(f'Starting notebook instance {notebook_instance_name}.')
+    if not instance_exists:
+        print(f'Creating notebook instance {notebook_instance_name}.')
+        sagemaker_client.create_notebook_instance(
+            NotebookInstanceName=notebook_instance_name,
+            InstanceType=instance_type,
+            RoleArn=role_arn,
+            LifecycleConfigName=lifecycle_config_name,
+            DirectInternetAccess='Enabled',
+            VolumeSizeInGB=5,
+            RootAccess='Enabled',
+            CustomImageArn=image_name
+        )
+    else:
+        print(f'Notebook instance {notebook_instance_name} already exists. Starting it.')
 
     sagemaker_client.start_notebook_instance(NotebookInstanceName=notebook_instance_name)
 
