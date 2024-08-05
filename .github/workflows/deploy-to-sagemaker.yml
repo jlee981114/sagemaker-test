@@ -29,43 +29,6 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
-          NOTEBOOK_INSTANCE_NAME: justin-test  # Change this to your notebook instance name
-          INSTANCE_TYPE: ml.g4dn.xlarge  # Change this to your instance type
-          ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps  # Change this to your SageMaker execution role ARN
-          LIFECYCLE_CONFIG_NAME: your-lifecycle-config-name  # Change this to your lifecycle config name
-        run: python manage_sagemaker.py
-
-name: Deploy to S3 and Start SageMaker Notebook
-
-on:
-  push:
-    branches:
-      - main  # Change this to the branch you want to use
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-
-      - name: Install dependencies
-        run: |
-          pip install awscli boto3
-
-      - name: Upload Notebooks to S3 and Start SageMaker Notebook Instance
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: justin-automation-output
-          S3_KEY_PREFIX: notebooks
           NOTEBOOK_INSTANCE_NAME: justin-test-notebook-instance  # Change this to your notebook instance name
           INSTANCE_TYPE: ml.g4dn.xlarge  # Change this to your instance type
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps  # Change this to your SageMaker execution role ARN
