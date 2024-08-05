@@ -40,6 +40,9 @@ LOCAL_PATH="/home/ec2-user/SageMaker/"
 
 # Download all notebooks from S3
 aws s3 sync s3://$S3_BUCKET/$S3_KEY_PREFIX $LOCAL_PATH
+
+# Install TensorFlow GPU
+pip install tensorflow-gpu==2.6.0
 '''
 
     # Encode the lifecycle configuration content as base64
