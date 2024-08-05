@@ -73,8 +73,11 @@ def start_sagemaker_notebook_instance():
     try:
         response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
         instance_exists = True
-    except sagemaker_client.exceptions.ResourceNotFound:
-        instance_exists = False
+    except sagemaker_client.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == 'ValidationException' and 'RecordNotFound' in e.response['Error']['Message']:
+            instance_exists = False
+        else:
+            raise
 
     if not instance_exists:
         print(f'Creating notebook instance {notebook_instance_name}.')
