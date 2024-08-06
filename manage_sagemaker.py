@@ -3,6 +3,8 @@ import os
 import glob
 import base64
 import time
+import botocore.exceptions
+from sagemaker import Session
 
 def upload_notebooks():
     s3_bucket = os.environ.get('S3_BUCKET')
@@ -74,43 +76,53 @@ def start_sagemaker_notebook_instance():
     if not notebook_instance_name or not instance_type or not role_arn or not lifecycle_config_name:
         raise ValueError("NOTEBOOK_INSTANCE_NAME, INSTANCE_TYPE, ROLE_ARN, and LIFECYCLE_CONFIG_NAME environment variables must be set")
 
-    sagemaker_client = boto3.client('sagemaker', region_name=os.environ.get('AWS_REGION'))
+    sagemaker_client = Session().sagemaker_client
 
     try:
         response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
-        instance_exists = True
+        print(f'Notebook instance {notebook_instance_name} exists with status {response["NotebookInstanceStatus"]}.')
     except sagemaker_client.exceptions.ClientError as e:
         if e.response['Error']['Code'] == 'ValidationException' and 'RecordNotFound' in e.response['Error']['Message']:
-            instance_exists = False
+            print(f'Creating notebook instance {notebook_instance_name}.')
+            sagemaker_client.create_notebook_instance(
+                NotebookInstanceName=notebook_instance_name,
+                InstanceType=instance_type,
+                RoleArn=role_arn,
+                LifecycleConfigName=lifecycle_config_name,
+                DirectInternetAccess='Enabled',
+                VolumeSizeInGB=5,
+                RootAccess='Enabled'
+            )
+            current_status = 'Pending'
         else:
             raise
-
-    if not instance_exists:
-        print(f'Creating notebook instance {notebook_instance_name}.')
-        sagemaker_client.create_notebook_instance(
-            NotebookInstanceName=notebook_instance_name,
-            InstanceType=instance_type,
-            RoleArn=role_arn,
-            LifecycleConfigName=lifecycle_config_name,
-            DirectInternetAccess='Enabled',
-            VolumeSizeInGB=5,
-            RootAccess='Enabled'
-        )
     else:
-        print(f'Notebook instance {notebook_instance_name} already exists.')
         current_status = response['NotebookInstanceStatus']
-        if current_status != 'Stopped':
-            print(f'Current status is {current_status}. Waiting for it to stop...')
-            waiter = sagemaker_client.get_waiter('notebook_instance_stopped')
-            waiter.wait(NotebookInstanceName=notebook_instance_name)
-            print(f'Notebook instance {notebook_instance_name} has stopped.')
+
+    if current_status == 'Pending':
+        print(f'Current status is {current_status}. Waiting for it to be in Stopped state...')
+        waiter = sagemaker_client.get_waiter('notebook_instance_stopped')
+        waiter.wait(NotebookInstanceName=notebook_instance_name)
+        print(f'Notebook instance {notebook_instance_name} has stopped.')
+    elif current_status != 'Stopped':
+        print(f'Current status is {current_status}. Waiting for it to stop...')
+        waiter = sagemaker_client.get_waiter('notebook_instance_stopped')
+        waiter.wait(NotebookInstanceName=notebook_instance_name)
+        print(f'Notebook instance {notebook_instance_name} has stopped.')
 
     print(f'Starting notebook instance {notebook_instance_name}.')
     sagemaker_client.start_notebook_instance(NotebookInstanceName=notebook_instance_name)
 
     waiter = sagemaker_client.get_waiter('notebook_instance_in_service')
-    waiter.wait(NotebookInstanceName=notebook_instance_name)
-    print(f'Notebook instance {notebook_instance_name} is now in service.')
+    try:
+        waiter.wait(NotebookInstanceName=notebook_instance_name)
+        print(f'Notebook instance {notebook_instance_name} is now in service.')
+    except botocore.exceptions.WaiterError as e:
+        print(f'Failed to start notebook instance: {e}')
+        response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
+        print(f'Current status: {response["NotebookInstanceStatus"]}')
+        if "FailureReason" in response:
+            print(f'Failure reason: {response["FailureReason"]}')
 
 if __name__ == "__main__":
     upload_notebooks()
