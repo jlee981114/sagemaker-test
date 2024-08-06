@@ -66,17 +66,19 @@ def start_sagemaker_notebook_instance():
     instance_type = os.environ.get('INSTANCE_TYPE')
     role_arn = os.environ.get('ROLE_ARN')
     lifecycle_config_name = os.environ.get('LIFECYCLE_CONFIG_NAME')
+    aws_region = os.environ.get('AWS_REGION')
 
     # Print environment variables for debugging
     print(f"NOTEBOOK_INSTANCE_NAME: {notebook_instance_name}")
     print(f"INSTANCE_TYPE: {instance_type}")
     print(f"ROLE_ARN: {role_arn}")
     print(f"LIFECYCLE_CONFIG_NAME: {lifecycle_config_name}")
+    print(f"AWS_REGION: {aws_region}")
 
-    if not notebook_instance_name or not instance_type or not role_arn or not lifecycle_config_name:
-        raise ValueError("NOTEBOOK_INSTANCE_NAME, INSTANCE_TYPE, ROLE_ARN, and LIFECYCLE_CONFIG_NAME environment variables must be set")
+    if not notebook_instance_name or not instance_type or not role_arn or not lifecycle_config_name or not aws_region:
+        raise ValueError("NOTEBOOK_INSTANCE_NAME, INSTANCE_TYPE, ROLE_ARN, LIFECYCLE_CONFIG_NAME, and AWS_REGION environment variables must be set")
 
-    sagemaker_client = Session().sagemaker_client
+    sagemaker_client = Session(boto_session=boto3.Session(region_name=aws_region)).sagemaker_client
 
     try:
         response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
