@@ -109,8 +109,15 @@ def start_sagemaker_notebook_instance():
     sagemaker_client.start_notebook_instance(NotebookInstanceName=notebook_instance_name)
 
     waiter = sagemaker_client.get_waiter('notebook_instance_in_service')
-    waiter.wait(NotebookInstanceName=notebook_instance_name)
-    print(f'Notebook instance {notebook_instance_name} is now in service.')
+    try:
+        waiter.wait(NotebookInstanceName=notebook_instance_name)
+        print(f'Notebook instance {notebook_instance_name} is now in service.')
+    except botocore.exceptions.WaiterError as e:
+        print(f'Failed to start notebook instance: {e}')
+        response = sagemaker_client.describe_notebook_instance(NotebookInstanceName=notebook_instance_name)
+        print(f'Current status: {response["NotebookInstanceStatus"]}')
+        if "FailureReason" in response:
+            print(f'Failure reason: {response["FailureReason"]}')
 
 if __name__ == "__main__":
     upload_notebooks()
