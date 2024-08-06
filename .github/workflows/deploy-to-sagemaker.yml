@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install awscli boto3
+          pip install awscli boto3 sagemaker
 
       - name: Upload Notebooks to S3 and Start SageMaker Notebook Instance
         env:
