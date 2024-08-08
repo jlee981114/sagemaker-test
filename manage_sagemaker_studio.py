@@ -20,36 +20,6 @@ def upload_notebooks():
         s3_client.upload_file(notebook, s3_bucket, s3_key)
         print(f'Notebook uploaded to s3://{s3_bucket}/{s3_key}')
 
-def create_sagemaker_studio_domain():
-    domain_name = os.environ.get('DOMAIN_NAME')
-    domain_id = os.environ.get('DOMAIN_ID')
-    role_arn = os.environ.get('ROLE_ARN')
-    aws_region = os.environ.get('AWS_REGION')
-    subnet_ids = os.environ.get('SUBNET_IDS').split(',')  # Expecting comma-separated subnet IDs
-    vpc_id = os.environ.get('VPC_ID')
-
-    if not domain_name or not domain_id or not role_arn or not aws_region or not subnet_ids or not vpc_id:
-        raise ValueError("DOMAIN_NAME, DOMAIN_ID, ROLE_ARN, AWS_REGION, SUBNET_IDS, and VPC_ID environment variables must be set")
-
-    sagemaker_client = boto3.client('sagemaker', region_name=aws_region)
-
-    try:
-        response = sagemaker_client.describe_domain(DomainId=domain_id)
-        print(f'SageMaker Studio domain {domain_id} exists.')
-    except sagemaker_client.exceptions.ResourceNotFound:
-        print(f'Creating SageMaker Studio domain {domain_id}.')
-        sagemaker_client.create_domain(
-            DomainName=domain_name,
-            DomainId=domain_id,
-            AuthMode='IAM',
-            DefaultUserSettings={
-                'ExecutionRole': role_arn
-            },
-            SubnetIds=subnet_ids,
-            VpcId=vpc_id
-        )
-        print(f'SageMaker Studio domain {domain_name} ({domain_id}) created.')
-
 def create_sagemaker_studio_user():
     domain_id = os.environ.get('DOMAIN_ID')
     user_profile_name = os.environ.get('USER_PROFILE_NAME')
@@ -74,5 +44,4 @@ def create_sagemaker_studio_user():
 
 if __name__ == "__main__":
     upload_notebooks()
-    create_sagemaker_studio_domain()
     create_sagemaker_studio_user()

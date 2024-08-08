@@ -29,10 +29,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
-          DOMAIN_NAME: justin-test-sagemaker-studio-domain
-          DOMAIN_ID: justin-test-sagemaker-studio-domain-id
+          DOMAIN_ID: d-mj9w5qvnb0ct  # Replace with your existing Domain ID
           USER_PROFILE_NAME: justin-test-sagemaker-studio-user
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
-          SUBNET_IDS: subnet-016229a0a23943e74  # Your actual Subnet ID
-          VPC_ID: vpc-086865caa3938cd2e  # Your actual VPC ID
         run: python manage_sagemaker_studio.py
