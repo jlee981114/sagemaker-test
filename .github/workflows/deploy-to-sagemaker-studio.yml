@@ -29,8 +29,8 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
-          DOMAIN_NAME: JustinTest  # Updated domain name
-          DOMAIN_ID: d-gvaj2xo6gt7b  # Updated domain ID
-          USER_PROFILE_NAME: justin  # Updated user profile name
+          DOMAIN_NAME: JustinAutomationTest  # Updated domain name
+          DOMAIN_ID: d-1c32der6qazn  # Updated domain ID
+          USER_PROFILE_NAME: JustinTestProfile  # Updated user profile name
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
         run: python manage_sagemaker_studio.py
