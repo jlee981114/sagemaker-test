@@ -2,7 +2,6 @@ import boto3
 import os
 import glob
 import base64
-import time
 import botocore.exceptions
 from sagemaker import Session
 
