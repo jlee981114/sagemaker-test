@@ -22,15 +22,25 @@ jobs:
         run: |
           pip install awscli boto3
 
-      - name: Upload Notebooks to S3 and Start SageMaker Studio
+      - name: Upload Notebooks to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
-          DOMAIN_NAME: JustinAutomationTest  # Updated domain name
-          DOMAIN_ID: d-1c32der6qazn  # Updated domain ID
-          USER_PROFILE_NAME: JustinTestProfile  # Updated user profile name
-          ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
         run: python manage_sagemaker_studio.py
+
+      - name: Create Lifecycle Configuration
+        run: |
+          base64 sync_notebooks.sh | tr -d '\n' > sync_notebooks_base64.sh
+          aws sagemaker create-notebook-instance-lifecycle-config \
+            --notebook-instance-lifecycle-config-name "SyncNotebooksLifecycleConfig" \
+            --on-start Content=$(cat sync_notebooks_base64.sh)
+
+      - name: Update SageMaker Studio User Profile
+        run: |
+          aws sagemaker update-user-profile \
+            --domain-id d-1c32der6qazn \
+            --user-profile-name JustinTestProfile \
+            --user-settings "LifecycleConfigArns=arn:aws:sagemaker:${{ secrets.AWS_REGION }}:728939754004:notebook-instance-lifecycle-config/SyncNotebooksLifecycleConfig"
