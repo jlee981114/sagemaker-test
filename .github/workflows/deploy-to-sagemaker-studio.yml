@@ -30,6 +30,6 @@ jobs:
           S3_BUCKET: justin-automation-output
           S3_KEY_PREFIX: notebooks
           DOMAIN_ID: d-mj9w5qvnb0ct  # Replace with your existing Domain ID
-          USER_PROFILE_NAME: justin-test-sagemaker-studio-user
+          USER_PROFILE_NAME: arbit-ds-3
           ROLE_ARN: arn:aws:iam::728939754004:role/service-role/SageMaker-MLOps
         run: python manage_sagemaker_studio.py
